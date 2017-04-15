@@ -92,14 +92,13 @@ class YOLONet(object):
                 net = self.conv2d_layer(net, 1024, 3, 2, padding='VALID', scope='conv_28')
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_29')
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_30')
-                net = tf.transpose(net, [0, 3, 1, 2], name='trans_31')
-                net = slim.flatten(net, scope='flat_32')
-                net = slim.fully_connected(net, 512, scope='fc_33')
-                net = slim.fully_connected(net, 4096, scope='fc_34')
-                net = slim.dropout(net, keep_prob=keep_prob,
-                                   is_training=is_training, scope='dropout_35')
-                net = slim.fully_connected(net, num_outputs,
-                                           activation_fn=None, scope='fc_36')
+
+                net = slim.conv2d(net, self.boxes_per_cell*(5+self.num_class), 1, stride=1, padding="SAME", scope="lastlayer")
+
+                # net = tf.transpose(net, [0, 3, 1, 2], name='trans_31')
+                # net = slim.flatten(net, scope='flat_32')
+                # net = slim.fully_connected(net, 512, scope='fc_33')
+                # net = slim.fully_connected(net, 4096, scope='fc_34')
         return net
 
     def calc_iou(self, boxes1, boxes2, scope='iou'):
@@ -210,7 +209,15 @@ class YOLONet(object):
             tf.summary.histogram('iou', iou_predict_truth)
 
 
+# def leaky_relu(alpha):
+#     def op(inputs):
+#         return tf.maximum(alpha * inputs, inputs, name='leaky_relu')
+#     return op
+
+
 def leaky_relu(alpha):
     def op(inputs):
-        return tf.maximum(alpha * inputs, inputs, name='leaky_relu')
+        f1 = 0.5 * (1 + alpha)
+        f2 = 0.5 * (1 - alpha)
+        return f1 * x + f2 * abs(x)
     return op
