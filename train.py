@@ -67,7 +67,7 @@ class Solver(object):
             load_timer.tic()
             images, labels = self.data.get()
             load_timer.toc()
-            feed_dict = {self.net.images: images, self.net.labels: labels, self.net.image_size : 448}
+            feed_dict = {self.net.images: images, self.net.labels: labels}
 
             if step % self.summary_iter == 0:
                 if step % (self.summary_iter * 10) == 0:
@@ -107,8 +107,8 @@ class Solver(object):
 
             if step % self.save_iter == 0:
                 print('{} Saving checkpoint file to: {}'.format(
-                    datetime.datetime.now().strftime('%m/%d %H:%M:%S')),
-                    self.output_dir)
+                    datetime.datetime.now().strftime('%m/%d %H:%M:%S'),
+                    self.output_dir))
                 self.saver.save(self.sess, self.ckpt_file,
                                 global_step=self.global_step)
 
