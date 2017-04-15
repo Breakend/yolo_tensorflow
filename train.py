@@ -67,7 +67,7 @@ class Solver(object):
             load_timer.tic()
             images, labels = self.data.get()
             load_timer.toc()
-            feed_dict = {self.net.images: images, self.net.labels: labels}
+            feed_dict = {self.net.images: images, self.net.labels: labels, self.net.image_size : 448}
 
             if step % self.summary_iter == 0:
                 if step % (self.summary_iter * 10) == 0:
