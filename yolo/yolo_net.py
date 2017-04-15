@@ -93,6 +93,8 @@ class YOLONet(object):
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_29')
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_30')
 
+                net = self.reorg_layer(net)
+
                 net = slim.conv2d(net, self.boxes_per_cell*(5+self.num_class), 1, stride=1, padding="SAME", scope="lastlayer")
 
                 # net = tf.transpose(net, [0, 3, 1, 2], name='trans_31')
@@ -100,6 +102,12 @@ class YOLONet(object):
                 # net = slim.fully_connected(net, 512, scope='fc_33')
                 # net = slim.fully_connected(net, 4096, scope='fc_34')
         return net
+
+    def reorg_layer(self, inp, s=1):
+        """
+        source: https://github.com/thtrieu/darkflow/blob/0fbec256fe6930229f08b8544082793c10ffbac7/net/ops/convolution.py
+        """
+        return tf.extract_image_patches(inp, [1,s,s,1], [1,s,s,1], [1,1,1,1], 'VALID')
 
     def calc_iou(self, boxes1, boxes2, scope='iou'):
         """calculate ious
@@ -196,6 +204,8 @@ class YOLONet(object):
             slim.losses.add_loss(object_loss)
             slim.losses.add_loss(noobject_loss)
             slim.losses.add_loss(coord_loss)
+
+            # TODO: add threshold as learned weight parameter by penalizing false-positives/negatives?
 
             tf.summary.scalar('class_loss', class_loss)
             tf.summary.scalar('object_loss', object_loss)
