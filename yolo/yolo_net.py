@@ -42,12 +42,12 @@ class YOLONet(object):
             self.total_loss = slim.losses.get_total_loss()
             tf.summary.scalar('total_loss', self.total_loss)
 
-    def conv2d_layer(self, inputs, out_size, kernel_size, padding, scope):
-        layer = slim.conv2d(inputs, out_size, kernel_size, padding, name="lconv%s"%scope)
+    def conv2d_layer(self, inputs, out_size, kernel_size, stride=1, padding='SAME', scope="def"):
+        layer = slim.conv2d(inputs, out_size, kernel_size, stride=stride, padding=padding, scope="lconv%s"%scope)
         layer = slim.batch_norm(layer, center=False, epsilon=2e-5,
-                                training=self.is_training, reuse=self.reuse,
-                                name="lbnconv%s"%scope)
-        layer = slim.bias_add(layer, name="lbiconv%s"%scope)
+                                is_training=self.is_training, reuse=self.reuse,
+                                scope="lbnconv%s"%scope)
+        layer = slim.bias_add(layer, scope="lbiconv%s"%scope)
         return layer
 
     def build_network(self,
