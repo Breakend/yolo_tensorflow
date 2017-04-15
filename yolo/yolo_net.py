@@ -219,15 +219,15 @@ class YOLONet(object):
             tf.summary.histogram('iou', iou_predict_truth)
 
 
-# def leaky_relu(alpha):
-#     def op(inputs):
-#         return tf.maximum(alpha * inputs, inputs, name='leaky_relu')
-#     return op
-
-
 def leaky_relu(alpha):
     def op(inputs):
-        f1 = 0.5 * (1 + alpha)
-        f2 = 0.5 * (1 - alpha)
-        return f1 * x + f2 * abs(x)
+        return tf.maximum(alpha * inputs, inputs, name='leaky_relu')
     return op
+
+
+# def leaky_relu(alpha):
+#     def op(inputs):
+#         f1 = 0.5 * (1 + alpha)
+#         f2 = 0.5 * (1 - alpha)
+#         return f1 * x + f2 * abs(x)
+#     return op
