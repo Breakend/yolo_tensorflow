@@ -62,45 +62,48 @@ class YOLONet(object):
                                 activation_fn=leaky_relu(alpha),
                                 weights_initializer=tf.truncated_normal_initializer(0.0, 0.01),
                                 weights_regularizer=slim.l2_regularizer(0.0005)):
+                # TODO: ditch this padding???
                 net = tf.pad(images, np.array([[0, 0], [3, 3], [3, 3], [0, 0]]), name='pad_1')
-                net = self.conv2d_layer(net, 64, 7, 2, padding='VALID', scope='conv_2')
+                net = self.conv2d_layer(net, 32, 3, 1, padding='VALID', scope='conv_2')
                 net = slim.max_pool2d(net, 2, padding='SAME', scope='pool_3')
-                net = self.conv2d_layer(net, 192, 3, scope='conv_4')
+                net = self.conv2d_layer(net, 64, 3, scope='conv_4')
                 net = slim.max_pool2d(net, 2, padding='SAME', scope='pool_5')
-                net = self.conv2d_layer(net, 128, 1, scope='conv_6')
-                net = self.conv2d_layer(net, 256, 3, scope='conv_7')
-                net = self.conv2d_layer(net, 256, 1, scope='conv_8')
-                net = self.conv2d_layer(net, 512, 3, scope='conv_9')
+                net = self.conv2d_layer(net, 128, 3, scope='conv_6')
+                net = self.conv2d_layer(net, 64, 1, scope='conv_7')
+                net = self.conv2d_layer(net, 128, 3, scope='conv_8')
                 net = slim.max_pool2d(net, 2, padding='SAME', scope='pool_10')
-                net = self.conv2d_layer(net, 256, 1, scope='conv_11')
-                net = self.conv2d_layer(net, 512, 3, scope='conv_12')
-                net = self.conv2d_layer(net, 256, 1, scope='conv_13')
-                net = self.conv2d_layer(net, 512, 3, scope='conv_14')
-                net = self.conv2d_layer(net, 256, 1, scope='conv_15')
-                net = self.conv2d_layer(net, 512, 3, scope='conv_16')
-                net = self.conv2d_layer(net, 256, 1, scope='conv_17')
-                net = self.conv2d_layer(net, 512, 3, scope='conv_18')
+                net = self.conv2d_layer(net, 256, 3, scope='conv_9')
+                net = self.conv2d_layer(net, 128, 1, scope='conv_11')
+                net = self.conv2d_layer(net, 256, 3, scope='conv_12')
+                net = slim.max_pool2d(net, 2, padding='SAME', scope='pool_12')
+                net = self.conv2d_layer(net, 512, 3, scope='conv_13')
+                net = self.conv2d_layer(net, 256, 1, scope='conv_14')
+                net = self.conv2d_layer(net, 512, 3, scope='conv_15')
+                net = self.conv2d_layer(net, 256, 1, scope='conv_16')
+                net = self.conv2d_layer(net, 512, 3, scope='conv_17')
+                net = slim.max_pool2d(net, 2, padding='SAME', scope='pool_17')
+
+                net = self.conv2d_layer(net, 1024, 3, scope='conv_18')
                 net = self.conv2d_layer(net, 512, 1, scope='conv_19')
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_20')
-                net = slim.max_pool2d(net, 2, padding='SAME', scope='pool_21')
                 net = self.conv2d_layer(net, 512, 1, scope='conv_22')
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_23')
-                net = self.conv2d_layer(net, 512, 1, scope='conv_24')
+                ####
+                net = self.conv2d_layer(net, 1024, 3, scope='conv_24')
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_25')
-                net = self.conv2d_layer(net, 1024, 3, scope='conv_26')
-                net = tf.pad(net, np.array([[0, 0], [1, 1], [1, 1], [0, 0]]), name='pad_27')
-                net = self.conv2d_layer(net, 1024, 3, 2, padding='VALID', scope='conv_28')
-                net = self.conv2d_layer(net, 1024, 3, scope='conv_29')
-                net = self.conv2d_layer(net, 1024, 3, scope='conv_30')
+                net = self.conv2d_layer(net, 64, 1, scope='conv_26')
 
-                net = self.reorg_layer(net)
+                net = self.reorg_layer(net, s=2)
+                #TODO: highways in here
+                net = self.conv2d_layer(net, 1024, 3, scope='conv_27')
 
                 net = slim.conv2d(net, self.boxes_per_cell*(5+self.num_class), 1, stride=1, padding="SAME", scope="lastlayer")
 
+
                 # net = tf.transpose(net, [0, 3, 1, 2], name='trans_31')
-                # net = slim.flatten(net, scope='flat_32')
-                # net = slim.fully_connected(net, 512, scope='fc_33')
-                # net = slim.fully_connected(net, 4096, scope='fc_34')
+                #net = slim.flatten(net, scope='flat_32')
+                #net = slim.fully_connected(net, 512, scope='fc_33')
+                #net = slim.fully_connected(net, 4096, scope='fc_34')
         return net
 
     def reorg_layer(self, inp, s=1):
