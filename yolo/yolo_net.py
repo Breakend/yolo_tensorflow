@@ -93,17 +93,18 @@ class YOLONet(object):
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_25')
                 net = self.conv2d_layer(net, 64, 1, scope='conv_26')
 
-                net = self.reorg_layer(net, s=2)
+                #net = self.reorg_layer(net, s=2)
                 #TODO: highways in here
                 net = self.conv2d_layer(net, 1024, 3, scope='conv_27')
 
                 net = slim.conv2d(net, self.boxes_per_cell*(5+self.num_class), 1, stride=1, padding="SAME", scope="lastlayer")
 
 
-                # net = tf.transpose(net, [0, 3, 1, 2], name='trans_31')
-                #net = slim.flatten(net, scope='flat_32')
-                #net = slim.fully_connected(net, 512, scope='fc_33')
-                #net = slim.fully_connected(net, 4096, scope='fc_34')
+                net = tf.transpose(net, [0, 3, 1, 2], name='trans_31')
+                net = slim.flatten(net, scope='flat_32')
+                net = slim.fully_connected(net, 512, scope='fc_33')
+                net = slim.fully_connected(net, 4096, scope='fc_34')
+                net = slim.fully_connected(net, num_outputs, scope='fc_35')
         return net
 
     def reorg_layer(self, inp, s=1):
